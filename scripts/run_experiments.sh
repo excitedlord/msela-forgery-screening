@@ -1,5 +1,5 @@
 #!/bin/bash
-# Reproduce FREUID-PRAI-2026 paper experiments
+# Reproduce Image Forgery Screening paper experiments
 # Usage: ./run_experiments.sh /path/to/CASIA2
 
 set -e
