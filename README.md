@@ -1,4 +1,4 @@
-# FREUID-PRAI-2026
+# IEEE-PRAI-2026
 
 **Format-Controlled Multi-Scale JPEG Compression Response Analysis for Image-Level Forgery Screening**
 
