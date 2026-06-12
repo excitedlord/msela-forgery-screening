@@ -11,7 +11,7 @@ This repository contains code for reproducing the experiments in our IEEE PRAI 2
 Key results on CASIA v2.0 (JPEG-only, format-controlled):
 - **AUC = 0.990** (stratified 5-fold CV)
 - **AUC = 0.976** (source-aware grouped CV)
-- 405 interpretable features, CPU-only, <0.3s/image
+- 405 interpretable features, CPU-only, <0.4s/image
 
 ## Repository Structure
 
