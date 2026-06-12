@@ -1,5 +1,5 @@
 """
-Feature extraction pipeline for FREUID-PRAI-2026.
+Feature extraction pipeline for Image Forgery Screening.
 
 Extracts 405 features across 7 families from JPEG images:
   - Multi-scale ELA (266 features): 7 quality levels × 38 statistics
@@ -385,7 +385,7 @@ def extract_dataset(image_paths: list, n_workers: int = None) -> np.ndarray:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Extract FREUID features')
+    parser = argparse.ArgumentParser(description='Extract Screening features')
     parser.add_argument('--data-dir', type=str, required=True,
                         help='Path to CASIA2 directory (containing Au/ and Tp/)')
     parser.add_argument('--output', type=str, default='features.npy',
