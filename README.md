@@ -43,7 +43,7 @@ python src/evaluate.py --features features.npy --protocol jpeg-only
 ## Citation
 
 ```bibtex
-@inproceedings{mandala2026freuid,
+@inproceedings{mandala2026,
   title={Format-Controlled Multi-Scale JPEG Compression Response Analysis for Image-Level Forgery Screening},
   author={Mandala, Sujith K},
   booktitle={Proc. IEEE International Conference on Pattern Recognition and Artificial Intelligence (PRAI)},
