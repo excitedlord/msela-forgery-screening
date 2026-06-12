@@ -1,5 +1,5 @@
 """
-Evaluation script for FREUID-PRAI-2026.
+Evaluation script for Image Forgery Screening.
 
 Runs cross-validation protocols:
   - JPEG-only stratified 5-fold
@@ -69,7 +69,7 @@ def run_grouped_cv(X, y, groups, n_splits=5):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Evaluate FREUID model')
+    parser = argparse.ArgumentParser(description='Evaluate the Screening model')
     parser.add_argument('--features', type=str, required=True,
                         help='Path to features .npy file')
     parser.add_argument('--labels', type=str, default=None,
