@@ -1,0 +1,6 @@
+{
+  "description": "Source-aware group assignments for JPEG-only CASIA v2.0 subset. Groups are derived from filename prefixes to prevent source-related images from appearing in both train and test.",
+  "n_groups": null,
+  "note": "Populate this file by running the grouping logic in the main notebook (cell: grouped evaluation). Group indices correspond to image order in features.npy (authentic first, then tampered, both sorted alphabetically).",
+  "groups": []
+}
