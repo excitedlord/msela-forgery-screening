@@ -8,7 +8,7 @@ DATA_DIR="${1:?Usage: $0 /path/to/CASIA2}"
 OUTPUT_DIR="./results"
 mkdir -p "$OUTPUT_DIR"
 
-echo "=== FREUID-PRAI-2026 Experiment Reproduction ==="
+echo "=== IEEE-PRAI-2026 Experiment Reproduction ==="
 echo "Data: $DATA_DIR"
 echo ""
 
