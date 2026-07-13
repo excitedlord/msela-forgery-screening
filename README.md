@@ -1,4 +1,4 @@
-# FREUID-PRAI-2026
+# IEEE-PRAI-2026
 
 **Format-Controlled Multi-Scale JPEG Compression Response Analysis for Image-Level Compression-History Forgery Screening**
 
@@ -86,7 +86,7 @@ python scripts/generate_repo_artifacts.py --casia-dir /path/to/CASIA2 --cache-di
 ## Citation
 
 ```bibtex
-@inproceedings{mandala2026freuid,
+@inproceedings{mandala2026prai,
   title={Format-Controlled Multi-Scale JPEG Compression Response Analysis for Image-Level Compression-History Forgery Screening},
   author={Mandala, Sujith K},
   booktitle={Proc. IEEE International Conference on Pattern Recognition and Artificial Intelligence (PRAI)},
