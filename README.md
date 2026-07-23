@@ -6,11 +6,11 @@ Sujith K Mandala — IEEE PRAI 2026
 
 ## Overview
 
-This repository contains the exact code, split files, and prediction outputs used to produce all results in the IEEE PRAI 2026 paper. Every reported metric can be independently verified from the committed artifacts.
+This repository contains the exact code, split files, and prediction outputs used to produce all results in the IEEE PRAI 2026 paper. The committed prediction files verify the headline internal and external metrics.
 
 **Primary results on CASIA v2.0 (JPEG-only, format-controlled):**
-- AUC = 0.990 (stratified 5-fold CV, 95% CI: 0.988–0.991)
-- AUC = 0.976 (source-component-aware grouped 5-fold CV)
+- AUC = 0.991 (stratified 5-fold CV, 95% CI: 0.990–0.992)
+- AUC = 0.974 (source-component-aware grouped 5-fold CV)
 - 405 interpretable features, CPU-only, ~0.4s/image
 
 ## Repository Structure
