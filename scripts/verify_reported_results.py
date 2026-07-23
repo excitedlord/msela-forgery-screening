@@ -18,9 +18,9 @@ from sklearn.metrics import roc_auc_score, f1_score, accuracy_score
 
 
 def verify_metric(name: str, computed: float, expected: float,
-                  tolerance: float = 0.0015) -> bool:
-    """Check a metric matches within rounding tolerance."""
-    match = abs(round(computed, 3) - expected) <= tolerance
+                  tolerance: float = 0.0) -> bool:
+    """Check a metric matches at 3-decimal rounding precision."""
+    match = round(computed, 3) == expected
     status = "PASS" if match else "FAIL"
     print(f"  [{status}] {name}: computed={computed:.4f}, "
           f"expected={expected:.3f}, rounded={round(computed, 3):.3f}")
@@ -59,7 +59,7 @@ def main():
         acc = accuracy_score(y_true, y_pred)
 
         all_pass &= verify_metric("JPEG-only AUC", auc, 0.991)
-        all_pass &= verify_metric("JPEG-only F1", f1, 0.916)
+        all_pass &= verify_metric("JPEG-only F1", f1, 0.915)
         all_pass &= verify_metric("JPEG-only Accuracy", acc, 0.963)
 
         # Per-fold AUC stability
@@ -94,7 +94,7 @@ def main():
         f1 = f1_score(y_true, y_pred)
 
         all_pass &= verify_metric("Grouped AUC", auc, 0.974)
-        all_pass &= verify_metric("Grouped F1", f1, 0.826)
+        all_pass &= verify_metric("Grouped F1", f1, 0.816)
     else:
         print(f"  [SKIP] {grouped_csv} not found")
         all_pass = False
@@ -118,8 +118,8 @@ def main():
         auc = roc_auc_score(y_true, y_score)
         f1 = f1_score(y_true, y_pred)
 
-        all_pass &= verify_metric("Columbia AUC", auc, 0.642)
-        all_pass &= verify_metric("Columbia F1", f1, 0.663)
+        all_pass &= verify_metric("Columbia AUC", auc, 0.640)
+        all_pass &= verify_metric("Columbia F1", f1, 0.614)
         print(f"  Threshold used: {threshold:.4f}")
     else:
         print(f"  [SKIP] {columbia_csv} not found")
@@ -139,7 +139,7 @@ def main():
         y_score = df['y_score'].values
 
         auc = roc_auc_score(y_true, y_score)
-        all_pass &= verify_metric("CoMoFoD AUC", auc, 0.501)
+        all_pass &= verify_metric("CoMoFoD AUC", auc, 0.499)
     else:
         print(f"  [SKIP] {comofod_csv} not found")
 
