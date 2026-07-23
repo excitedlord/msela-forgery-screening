@@ -1,0 +1,13 @@
+# Exact package versions used to produce all reported results.
+# Install with: pip install -r requirements-lock.txt
+#
+# Hardware: Apple M3 Pro, 12-core, 36 GB unified memory
+# OS: macOS (arm64)
+# Python: 3.13.3
+
+numpy==2.4.6
+scipy==1.17.1
+scikit-learn==1.9.0
+Pillow==12.2.0
+pandas==3.0.3
+tqdm==4.68.1
