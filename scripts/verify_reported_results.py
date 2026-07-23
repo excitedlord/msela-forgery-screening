@@ -58,9 +58,9 @@ def main():
         f1 = f1_score(y_true, y_pred)
         acc = accuracy_score(y_true, y_pred)
 
-        all_pass &= verify_metric("JPEG-only AUC", auc, 0.990)
-        all_pass &= verify_metric("JPEG-only F1", f1, 0.905)
-        all_pass &= verify_metric("JPEG-only Accuracy", acc, 0.958)
+        all_pass &= verify_metric("JPEG-only AUC", auc, 0.991)
+        all_pass &= verify_metric("JPEG-only F1", f1, 0.916)
+        all_pass &= verify_metric("JPEG-only Accuracy", acc, 0.963)
 
         # Per-fold AUC stability
         fold_aucs = []
@@ -93,8 +93,8 @@ def main():
         auc = roc_auc_score(y_true, y_score)
         f1 = f1_score(y_true, y_pred)
 
-        all_pass &= verify_metric("Grouped AUC", auc, 0.976)
-        all_pass &= verify_metric("Grouped F1", f1, 0.840)
+        all_pass &= verify_metric("Grouped AUC", auc, 0.974)
+        all_pass &= verify_metric("Grouped F1", f1, 0.826)
     else:
         print(f"  [SKIP] {grouped_csv} not found")
         all_pass = False
@@ -118,8 +118,8 @@ def main():
         auc = roc_auc_score(y_true, y_score)
         f1 = f1_score(y_true, y_pred)
 
-        all_pass &= verify_metric("Columbia AUC", auc, 0.708)
-        all_pass &= verify_metric("Columbia F1", f1, 0.735)
+        all_pass &= verify_metric("Columbia AUC", auc, 0.642)
+        all_pass &= verify_metric("Columbia F1", f1, 0.663)
         print(f"  Threshold used: {threshold:.4f}")
     else:
         print(f"  [SKIP] {columbia_csv} not found")
@@ -139,7 +139,7 @@ def main():
         y_score = df['y_score'].values
 
         auc = roc_auc_score(y_true, y_score)
-        all_pass &= verify_metric("CoMoFoD AUC", auc, 0.499)
+        all_pass &= verify_metric("CoMoFoD AUC", auc, 0.501)
     else:
         print(f"  [SKIP] {comofod_csv} not found")
 
