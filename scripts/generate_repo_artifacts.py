@@ -199,9 +199,7 @@ def main():
         min_samples_leaf=20,
         l2_regularization=1.0,
         max_bins=255,
-        early_stopping=True,
-        n_iter_no_change=50,
-        validation_fraction=0.1,
+        early_stopping=False,
         random_state=SEED,
     )
 
