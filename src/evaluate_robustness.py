@@ -57,16 +57,18 @@ def extract_perturbed_features(args_tuple) -> np.ndarray:
     perturbed = perturb_image(img, perturbation)
 
     from extract_features import (
+        compute_ela_cache,
         extract_ela_features, extract_ratio_features,
         extract_entropy_features, extract_fft_features,
         extract_edge_features, extract_srm_features,
         extract_dct_noise_color_features
     )
 
+    residuals = compute_ela_cache(perturbed)
     features = np.concatenate([
-        extract_ela_features(perturbed),
-        extract_ratio_features(perturbed),
-        extract_entropy_features(perturbed),
+        extract_ela_features(residuals),
+        extract_ratio_features(residuals),
+        extract_entropy_features(residuals),
         extract_fft_features(perturbed),
         extract_edge_features(perturbed),
         extract_srm_features(perturbed),
@@ -116,26 +118,9 @@ if __name__ == '__main__':
 
     n_workers = args.workers or min(cpu_count(), 12)
 
-    # Train models on clean data
-    print("Training 5-fold models on clean features...")
+    # Evaluate each perturbation using proper OOF protocol:
+    # train on clean fold, predict perturbed held-out fold only
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    models = []
-    fold_thresholds = []
-
-    for fold, (train_idx, val_idx) in enumerate(skf.split(X_clean, y)):
-        sw = compute_sample_weights(y[train_idx])
-        model = HistGradientBoostingClassifier(**HGB_PARAMS)
-        model.fit(X_clean[train_idx], y[train_idx], sample_weight=sw)
-        models.append(model)
-
-        scores_v = model.predict_proba(X_clean[val_idx])[:, 1]
-        t = select_threshold_on_validation(y[val_idx], scores_v)
-        fold_thresholds.append(t)
-
-    threshold = np.median(fold_thresholds)
-    print(f"Median threshold: {threshold:.4f}")
-
-    # Evaluate each perturbation
     results_summary = []
 
     for pert in args.perturbations:
@@ -149,14 +134,25 @@ if __name__ == '__main__':
             X_pert = np.array(pool.map(extract_perturbed_features, task_args),
                               dtype=np.float32)
 
-        # Ensemble prediction
-        scores = np.zeros(len(y))
-        for model in models:
-            scores += model.predict_proba(X_pert)[:, 1]
-        scores /= len(models)
+        # OOF: each sample predicted only by the model that never saw it
+        oof_scores = np.full(len(y), np.nan)
+        fold_thresholds = []
 
-        y_pred = (scores >= threshold).astype(int)
-        auc = roc_auc_score(y, scores)
+        for fold, (train_idx, val_idx) in enumerate(skf.split(X_clean, y)):
+            sw = compute_sample_weights(y[train_idx])
+            model = HistGradientBoostingClassifier(**HGB_PARAMS)
+            model.fit(X_clean[train_idx], y[train_idx], sample_weight=sw)
+
+            # Predict perturbed version of the held-out fold only
+            scores_val = model.predict_proba(X_pert[val_idx])[:, 1]
+            oof_scores[val_idx] = scores_val
+
+            t = select_threshold_on_validation(y[val_idx], scores_val)
+            fold_thresholds.append(t)
+
+        threshold = np.median(fold_thresholds)
+        y_pred = (oof_scores >= threshold).astype(int)
+        auc = roc_auc_score(y, oof_scores)
         f1 = f1_score(y, y_pred)
 
         print(f"  AUC = {auc:.4f}")

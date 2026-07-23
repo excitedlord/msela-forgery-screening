@@ -30,8 +30,7 @@ HGB_PARAMS = {
     'min_samples_leaf': 20,
     'l2_regularization': 1.0,
     'max_bins': 255,
-    'n_iter_no_change': 50,          # early stopping patience
-    'validation_fraction': 0.1,       # 10% for early stopping
+    'early_stopping': False,   # disabled; early_stopping='auto' does not trigger for n<10000
     'random_state': 42,
 }
 

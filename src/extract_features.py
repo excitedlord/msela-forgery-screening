@@ -47,6 +47,15 @@ def compute_ela(img: Image.Image, quality: int) -> np.ndarray:
     return residual.mean(axis=2)  # Channel-averaged ELA map
 
 
+def compute_ela_cache(img: Image.Image) -> dict:
+    """Compute all seven ELA residual maps once and return as a dict.
+
+    This ensures each quality level is computed exactly once (7 recompressions
+    total), even when ELA maps are shared across feature families.
+    """
+    return {q: compute_ela(img, q) for q in QUALITIES}
+
+
 def ela_statistics(residual: np.ndarray) -> np.ndarray:
     """Extract 38 statistics from one ELA residual map.
 
@@ -89,12 +98,11 @@ def ela_statistics(residual: np.ndarray) -> np.ndarray:
     return np.array(global_stats + grid_stats, dtype=np.float64)
 
 
-def extract_ela_features(img: Image.Image) -> np.ndarray:
+def extract_ela_features(residuals: dict) -> np.ndarray:
     """Extract multi-scale ELA features: 7 qualities × 38 stats = 266."""
     features = []
     for q in QUALITIES:
-        residual = compute_ela(img, q)
-        features.append(ela_statistics(residual))
+        features.append(ela_statistics(residuals[q]))
     return np.concatenate(features)
 
 
@@ -107,21 +115,12 @@ RATIO_PAIRS = [(30, 90), (50, 90), (60, 80), (30, 60)]
 EPSILON = 1e-6
 
 
-def extract_ratio_features(img: Image.Image) -> np.ndarray:
+def extract_ratio_features(residuals: dict) -> np.ndarray:
     """Extract 16 cross-quality ratio features from pixel-wise ratio maps.
 
     For each pair (qa, qb), constructs R(x,y) = E_qa(x,y) / (E_qb(x,y) + eps)
     and extracts mean, std, 5th percentile, 95th percentile.
     """
-    needed_qs = set()
-    for qa, qb in RATIO_PAIRS:
-        needed_qs.add(qa)
-        needed_qs.add(qb)
-
-    residuals = {}
-    for q in needed_qs:
-        residuals[q] = compute_ela(img, q)
-
     features = []
     for qa, qb in RATIO_PAIRS:
         ratio_map = residuals[qa] / (residuals[qb] + EPSILON)
@@ -141,14 +140,15 @@ def extract_ratio_features(img: Image.Image) -> np.ndarray:
 # 4×4 grid Shannon entropy on q=50 ELA map → 16 cells + std + range = 18
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def extract_entropy_features(img: Image.Image) -> np.ndarray:
+def extract_entropy_features(residuals: dict) -> np.ndarray:
     """Extract 18 ELA entropy features.
 
     Uses q=50 ELA map, normalized to [0,255] and quantized to integers.
-    Divides into 4×4 grid; per cell computes Shannon entropy (32-bin histogram).
+    Divides into 4x4 grid; per cell computes Shannon entropy (32-bin histogram).
+    Entropy uses normalized count probabilities: p = counts / counts.sum().
     Returns: 16 cell entropies + their std + their range = 18.
     """
-    residual = compute_ela(img, 50)
+    residual = residuals[50]
 
     # Normalize to [0, 255] and quantize
     r_min, r_max = residual.min(), residual.max()
@@ -165,8 +165,10 @@ def extract_entropy_features(img: Image.Image) -> np.ndarray:
         for col in range(4):
             cell = normalized[row * grid_h:(row + 1) * grid_h,
                               col * grid_w:(col + 1) * grid_w].ravel()
-            hist, _ = np.histogram(cell, bins=32, range=(0, 255), density=True)
-            H = -np.sum((hist + EPSILON) * np.log2(hist + EPSILON))
+            counts, _ = np.histogram(cell, bins=32, range=(0, 256))
+            p = counts / (counts.sum() + EPSILON)
+            p_nz = p[p > 0]
+            H = -np.sum(p_nz * np.log2(p_nz))
             cell_entropies.append(H)
 
     cell_entropies = np.array(cell_entropies)
@@ -449,14 +451,17 @@ def extract_all_features(img_path: str) -> np.ndarray:
     """Extract all 405 features from a single image."""
     img = Image.open(img_path).convert('RGB')
 
+    # Compute all 7 ELA maps exactly once (7 recompressions total)
+    residuals = compute_ela_cache(img)
+
     features = np.concatenate([
-        extract_ela_features(img),              # 266
-        extract_ratio_features(img),            # 16
-        extract_entropy_features(img),          # 18
-        extract_fft_features(img),              # 6
-        extract_edge_features(img),             # 20
-        extract_srm_features(img),              # 27
-        extract_dct_noise_color_features(img),  # 52
+        extract_ela_features(residuals),              # 266
+        extract_ratio_features(residuals),            # 16
+        extract_entropy_features(residuals),          # 18
+        extract_fft_features(img),                    # 6
+        extract_edge_features(img),                   # 20
+        extract_srm_features(img),                    # 27
+        extract_dct_noise_color_features(img),        # 52
     ])
 
     assert features.shape[0] == TOTAL_FEATURES, \
